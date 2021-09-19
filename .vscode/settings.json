@@ -1,0 +1,17 @@
+{
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none"
+    },
+    "cSpell.words": [
+        "barabasi",
+        "faticanti",
+        "ndarray",
+        "networkx",
+        "nsgaii",
+        "Omni",
+        "pymoo",
+        "slas",
+        "tolist",
+        "untrusted"
+    ]
+}
