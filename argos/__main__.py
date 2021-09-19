@@ -41,39 +41,6 @@ def add_trusted_servers():
         # Defining the 'trusted_servers' attribute (randomly pick servers that will be trusted by the user)
         user.trusted_servers = [random.choice(EdgeServer.all()) for _ in range(number_of_trusted_servers[user.id - 1])]
 
-        if VERBOSE:
-            print(f"{user}. Trusted Servers: {[server for server in user.trusted_servers]}. Services:")
-            for service in user.applications[0].services:
-                print(f"    {service}. Privacy: {service.privacy_requirement}. Trusted Servers: {user.trusted_servers}")
-
-
-def customized_shortest_path(self, origin: object, target: object, user: object, app: object) -> list:
-    """[summary]
-
-    Args:
-        origin (object): Origin network node.
-        target (object): Destination network node.
-        app (object): User that will utilize the communication path.
-        app (object): Application whose data will be transferred throughout the communication path.
-
-    Returns:
-        list: Best communication path.
-    """
-
-    # Releasing the current communication path so that the currently used links have
-    # equal chances to be chosen if they have enough bandwidth to accommodate the demand.
-    self.release_communication_path(communication_path=user.communication_paths[app], app=app)
-
-    if origin == target:
-        shortest_path = []
-    else:
-        shortest_path = origin.shortest_paths[target]
-
-    # Allocating back network links used in the application's communication path
-    self.allocate_communication_path(communication_path=user.communication_paths[app], app=app)
-
-    return shortest_path
-
 
 def run(self, algorithm: typing.Callable):
     """Executes the simulation.
