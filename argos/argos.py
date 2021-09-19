@@ -22,28 +22,14 @@ def argos():
 
             host_candidates = get_host_candidates(user=user)
 
-            services = sorted(app.services, key=lambda s: -s.demand)
-            services = app.services
+            services = sorted(app.services, key=lambda s: (-s.privacy_requirement, -s.demand))
             allocation_insights = get_allocation_insights(user=user, services=services)
 
             for service in services:
                 if allocation_insights[service]:
-                    host_candidates = sorted(
-                        host_candidates,
-                        key=lambda c: (
-                            -c["is_trusted"],
-                            c["delay"],
-                            c["trusted_users"],
-                        ),
-                    )
+                    host_candidates = sorted(host_candidates, key=lambda c: (-c["is_trusted"], c["delay"]))
                 else:
-                    host_candidates = sorted(
-                        host_candidates,
-                        key=lambda c: (
-                            c["delay"],
-                            c["trusted_users"],
-                        ),
-                    )
+                    host_candidates = sorted(host_candidates, key=lambda c: (c["delay"]))
 
                 # Greedily iterating over the list of edge servers to find a host for the service
                 for edge_server_metadata in host_candidates:

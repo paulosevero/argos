@@ -40,7 +40,7 @@ def faticanti2020():
             edge_servers = sorted(
                 EdgeServer.all(),
                 key=lambda s: (
-                    s not in user.trusted_servers,
+                    -(s in user.trusted_servers),
                     get_delay(origin=user, target=s),
                     s.capacity - s.demand,
                 ),
