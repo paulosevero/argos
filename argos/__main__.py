@@ -131,22 +131,22 @@ def show_results(self):
     """Displays the simulation results."""
     for algorithm, results in self.metrics.items():
 
-        sla_violations = 0
-        services_on_trusted_servers = 0
-        privacy_violations = 0
-        migrations = 0
+        sla_violations = []
+        services_on_trusted_servers = []
+        privacy_violations = []
+        migrations = []
 
         for step_results in results:
-            sla_violations += step_results["sla_violations"]
-            services_on_trusted_servers += step_results["services_on_trusted_servers"]
-            privacy_violations += step_results["privacy_violations"]
-            migrations += step_results["migrations"]
+            sla_violations.append(step_results["sla_violations"])
+            services_on_trusted_servers.append(step_results["services_on_trusted_servers"])
+            privacy_violations.append(step_results["privacy_violations"])
+            migrations.append(step_results["migrations"])
 
         print(f"Algorithm: {algorithm}")
-        print(f"    SLA violations: {sla_violations}")
-        print(f"    Privacy Violations: {privacy_violations}")
-        print(f"    Migrations: {migrations}")
-        print(f"    Services on Trusted Servers: {services_on_trusted_servers}")
+        print(f"    SLA violations: {sum(sla_violations)}")
+        print(f"    Migrations: {sum(migrations)}")
+        print(f"    Privacy Violations: {sum(privacy_violations)} - {privacy_violations}")
+        print(f"    Services on Trusted Servers: {sum(services_on_trusted_servers)} - {services_on_trusted_servers}")
 
 
 def main():
