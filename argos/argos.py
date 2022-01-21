@@ -17,9 +17,7 @@ def argos():
         user = app.users[0]
         services = sorted(app.services, key=lambda s: (-s.privacy_requirement, -s.demand))
 
-        trusted_edge_servers = sorted(get_host_candidates(user=user, trustworthiness=1), key=lambda s: s["delay"])
-        untrusted_edge_servers = sorted(get_host_candidates(user=user, trustworthiness=0), key=lambda s: s["delay"])
-        edge_servers = trusted_edge_servers + untrusted_edge_servers
+        edge_servers = sorted(get_host_candidates(user=user), key=lambda s: (-s["is_trusted"], s["delay"]))
 
         for service in services:
             # Greedily iterating over the list of edge servers to find a host for the service
@@ -36,12 +34,11 @@ def argos():
         user.set_communication_path(app=app)
 
 
-def get_host_candidates(user: object, trustworthiness: int) -> list:
+def get_host_candidates(user: object) -> list:
     """Get list of host candidates for hosting services of a given user.
 
     Args:
         user (object): User object.
-        trustworthiness (int): Whether the method should return trusted (1) or not trusted servers (0).
 
     Returns:
         list: List of host candidates.
@@ -53,14 +50,13 @@ def get_host_candidates(user: object, trustworthiness: int) -> list:
         trusted_users = sum([1 for u in User.all() if edge_server in u.trusted_servers and u != user])
         is_trusted = 1 if edge_server in user.trusted_servers else 0
 
-        if is_trusted == trustworthiness:
-            host_candidates.append(
-                {
-                    "object": edge_server,
-                    "delay": delay,
-                    "trusted_users": trusted_users,
-                    "is_trusted": int(is_trusted),
-                }
-            )
+        host_candidates.append(
+            {
+                "object": edge_server,
+                "delay": delay,
+                "trusted_users": trusted_users,
+                "is_trusted": is_trusted,
+            }
+        )
 
     return host_candidates
