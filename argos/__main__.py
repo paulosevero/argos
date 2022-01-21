@@ -187,16 +187,16 @@ def main():
     simulator = Simulator()
 
     # Loading the dataset
-    simulator.load_dataset(input_file="datasets/scenario1.json")
+    simulator.load_dataset(input_file="datasets/closer2022.json")
 
     # Extending the simulated objects with privacy/trustworthiness attributes
     add_privacy_requirements()
     add_trusted_servers()
 
     # Running the simulation
-    # simulator.run(algorithm=never_migrate)
-    # simulator.run(algorithm=follow_vehicle)
-    # simulator.run(algorithm=faticanti2020)
+    simulator.run(algorithm=never_migrate)
+    simulator.run(algorithm=follow_vehicle)
+    simulator.run(algorithm=faticanti2020)
     simulator.run(algorithm=argos)
 
     # Displaying simulation results

@@ -97,6 +97,15 @@ topology = Topology.new_barabasi_albert(
     min_links_per_node=2,
 )
 
+# Configuring network attributes
+n_links = len(list(topology.edges()))
+link_delays = uniform(n_items=n_links, valid_values=[4, 8], shuffle_distribution=True)
+link_bandwidths = uniform(n_items=n_links, valid_values=[2, 4], shuffle_distribution=True)
+
+for i, link in enumerate(topology.edges(data=True)):
+    link[2]["delay"] = link_delays[i]
+    link[2]["bandwidth"] = link_bandwidths[i]
+
 
 # Creating users
 n_users = n_applications
@@ -291,7 +300,7 @@ dataset["network"] = {
 }
 
 # Defining output file name
-dataset_file_name = "scenario1"
+dataset_file_name = "closer2022"
 
 # Storing the dataset to an output file
 with open(f"datasets/{dataset_file_name}.json", "w") as output_file:
