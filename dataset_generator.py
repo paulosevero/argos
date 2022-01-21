@@ -40,7 +40,7 @@ random.seed(SEED)
 
 
 # Defining number of simulation steps
-simulation_steps = 10
+simulation_steps = 30
 
 # Creating list of hexagons to represent the map
 map_coordinates = create_hexagonal_grid(x_size=10, y_size=10)
@@ -52,16 +52,16 @@ base_station_builder.create_objects(n_objects=n_base_stations)
 base_station_builder.set_coordinates_all_base_stations(coordinates=map_coordinates)
 
 # Creating edge servers
-n_edge_servers = n_base_stations
+n_edge_servers = 60
 edge_server_builder = EdgeServerBuilder()
 edge_server_builder.create_objects(n_objects=n_edge_servers)
 edge_servers_coordinates = random.sample(map_coordinates, n_edge_servers)
 edge_server_builder.set_coordinates_all_edge_servers(coordinates=edge_servers_coordinates)
-edge_servers_capacity = uniform(n_items=n_edge_servers, valid_values=[10, 20], shuffle_distribution=True)
+edge_servers_capacity = uniform(n_items=n_edge_servers, valid_values=[100, 200], shuffle_distribution=True)
 edge_server_builder.set_capacity_all_edge_servers(capacity_values=edge_servers_capacity)
 
 # Creating applications and services (and defining relationships between them)
-n_applications = 200
+n_applications = 120
 application_builder = ApplicationBuilder()
 application_builder.create_objects(n_objects=n_applications)
 network_demands = uniform(n_items=n_applications, valid_values=[2, 4], shuffle_distribution=True)
@@ -72,7 +72,7 @@ services_per_application = uniform(n_items=n_applications, valid_values=[2], shu
 n_services = sum(services_per_application)
 service_builder = ServiceBuilder()
 service_builder.create_objects(n_objects=n_services)
-service_demands = uniform(n_items=n_services, valid_values=[1, 2, 3, 4], shuffle_distribution=True)
+service_demands = uniform(n_items=n_services, valid_values=[10, 20, 30, 40, 50], shuffle_distribution=True)
 service_builder.set_demand_all_services(demand_values=service_demands)
 
 for index, application in enumerate(Application.all()):
@@ -112,7 +112,7 @@ users_per_application = uniform(n_items=n_users, valid_values=[1], shuffle_distr
 for index, user in enumerate(User.all()):
     delay_slas = uniform(
         n_items=users_per_application[index],
-        valid_values=[50, 100],
+        valid_values=[60, 120],
         shuffle_distribution=True,
     )
 
@@ -291,7 +291,7 @@ dataset["network"] = {
 }
 
 # Defining output file name
-dataset_file_name = "scenario2"
+dataset_file_name = "scenario1"
 
 # Storing the dataset to an output file
 with open(f"datasets/{dataset_file_name}.json", "w") as output_file:

@@ -33,13 +33,20 @@ def add_privacy_requirements():
 
 
 def add_trusted_servers():
-    # Defining the number of trusted servers per user based on an uniform distribution
-    number_of_trusted_servers = uniform(n_items=User.count(), valid_values=[15, 30], shuffle_distribution=True)
+    # Defining list of providers
+    providers = [1, 2]
 
-    # Assigning trusted servers of each user
-    for user in User.all():
-        # Defining the 'trusted_servers' attribute (randomly pick servers that will be trusted by the user)
-        user.trusted_servers = [random.choice(EdgeServer.all()) for _ in range(number_of_trusted_servers[user.id - 1])]
+    # Assigning providers to edge servers
+    edge_servers_providers = uniform(n_items=EdgeServer.count(), valid_values=providers, shuffle_distribution=True)
+    for i, edge_server in enumerate(EdgeServer.all()):
+        edge_server.provider = edge_servers_providers[i]
+
+    # Assigning trusted providers to users
+    providers_trusted_by_users = uniform(n_items=User.count(), valid_values=providers, shuffle_distribution=True)
+    for i, user in enumerate(User.all()):
+        trusted_provider = providers_trusted_by_users[i]
+        trusted_servers = [edge_server for edge_server in EdgeServer.all() if edge_server.provider == trusted_provider]
+        user.trusted_servers = trusted_servers
 
 
 def run(self, algorithm: typing.Callable):
@@ -89,7 +96,7 @@ def collect_metrics(self, algorithm: str):
     sla_violations = 0
     services_on_trusted_servers = 0
     privacy_violations = 0
-    migrations = 0
+    migrations = []
 
     # Computing user-related metrics (SLA violations)
     for user in User.all():
@@ -97,13 +104,22 @@ def collect_metrics(self, algorithm: str):
             if user.delays[app] > user.delay_slas[app]:
                 sla_violations += 1
 
+    # Computing application-related metrics (Privacy violations)
+    for application in Application.all():
+        user = application.users[0]
+        services_on_untrusted_servers = 0
+        for service in application.services:
+            if service.server not in user.trusted_servers and service.privacy_requirement:
+                services_on_untrusted_servers += 1
+
+        if services_on_untrusted_servers > 0:
+            privacy_violations += 1
+
     # Computing services-related metrics (Services on trusted servers, Privacy violations, Number of migrations)
     for service in Service.all():
         user = service.application.users[0]
         if service.server in user.trusted_servers:
             services_on_trusted_servers += 1
-        elif service.server not in user.trusted_servers and service.privacy_requirement:
-            privacy_violations += 1
 
         # As the metrics collection method is called before the algorithm execution, we need to compute the number of
         # migrations performed in the previous step.
@@ -113,7 +129,7 @@ def collect_metrics(self, algorithm: str):
                 or self.current_step == self.simulation_steps
                 and migration["step"] == self.current_step
             ):
-                migrations += 1
+                migrations.append(migration["duration"])
 
     # Creating the structure to accommodate simulation metrics
     self.metrics[algorithm].append(
@@ -140,11 +156,21 @@ def show_results(self):
             sla_violations.append(step_results["sla_violations"])
             services_on_trusted_servers.append(step_results["services_on_trusted_servers"])
             privacy_violations.append(step_results["privacy_violations"])
-            migrations.append(step_results["migrations"])
+            migrations.extend(step_results["migrations"])
+
+        number_of_migrations = len(migrations)
+        overall_migration_duration = sum(migrations) if len(migrations) > 0 else 0
+        average_migration_duration = sum(migrations) / len(migrations) if len(migrations) > 0 else 0
+        shortest_migration_duration = min(migrations) if len(migrations) > 0 else 0
+        longest_migration_duration = max(migrations) if len(migrations) > 0 else 0
 
         print(f"Algorithm: {algorithm}")
         print(f"    SLA violations: {sum(sla_violations)}")
-        print(f"    Migrations: {sum(migrations)}")
+        print(f"    Migrations: {number_of_migrations}")
+        print(f"    Overall Migration Duration: {overall_migration_duration}")
+        print(f"    Average Migration Duration: {average_migration_duration}")
+        print(f"    Shortest Migration Duration: {shortest_migration_duration}")
+        print(f"    Longest Migration Duration: {longest_migration_duration}")
         print(f"    Privacy Violations: {sum(privacy_violations)} - {privacy_violations}")
         print(f"    Services on Trusted Servers: {sum(services_on_trusted_servers)} - {services_on_trusted_servers}")
 
@@ -161,16 +187,16 @@ def main():
     simulator = Simulator()
 
     # Loading the dataset
-    simulator.load_dataset(input_file="datasets/paper.json")
+    simulator.load_dataset(input_file="datasets/scenario1.json")
 
     # Extending the simulated objects with privacy/trustworthiness attributes
     add_privacy_requirements()
     add_trusted_servers()
 
     # Running the simulation
-    simulator.run(algorithm=never_migrate)
-    simulator.run(algorithm=follow_vehicle)
-    simulator.run(algorithm=faticanti2020)
+    # simulator.run(algorithm=never_migrate)
+    # simulator.run(algorithm=follow_vehicle)
+    # simulator.run(algorithm=faticanti2020)
     simulator.run(algorithm=argos)
 
     # Displaying simulation results
