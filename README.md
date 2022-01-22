@@ -26,7 +26,7 @@ Within the repository, you'll find the following directories and files, logicall
 ├── datasets/
 ├── edge_sim_py-0.1.0-py3-none-any.whl
 ├── poetry.lock
-├── pyproject.toml
+└── pyproject.toml
 ```
 
 In the root directory, the `pyproject.toml` file organizes all project dependencies, including the minimum required version of the Python language and the "whl" file containing the simulator core (i.e., `edge_sim_py-0.1.0-py3-none-any.whl`). The `pyproject.toml` file guides the execution of Poetry, a Python library which installs the simulator securely, avoiding conflicts with external dependencies.
