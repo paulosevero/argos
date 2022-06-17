@@ -85,4 +85,4 @@ python3 -B -m argos
 
 ### How to Cite
 
-To be defined.
+Souza, P.; Crestani, Â.; Rubin, F.; Ferreto, T. and Rossi, F. (2022). Latency-aware Privacy-preserving Service Migration in Federated Edges. In International Conference on Cloud Computing and Services Science (CLOSER), pages 288-295. DOI: 10.5220/0011084500003200.
